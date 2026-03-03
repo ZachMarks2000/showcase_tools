@@ -530,6 +530,19 @@
     opacity: 0;
   }
 
+  #countdown.no-darken .countdown-message {
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8), 0 4px 30px rgba(0,0,0,0.6);
+    font-weight: 400;
+  }
+
+  #countdown.no-darken .timer-value {
+    filter: drop-shadow(0 3px 12px rgba(0,0,0,0.7)) drop-shadow(0 6px 30px rgba(0,0,0,0.5));
+  }
+
+  #countdown.no-darken .timer-label {
+    text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+  }
+
   #countdown .content {
     position: relative;
     z-index: 2;
@@ -982,11 +995,13 @@
       const noDarken = !darkenToggle.checked;
       bgLayer.classList.toggle('no-darken', noDarken);
       overlayEl.classList.toggle('no-darken', noDarken);
+      countdownScreen.classList.toggle('no-darken', noDarken);
     } else {
       bgLayer.style.backgroundImage = 'none';
       bgLayer.style.background = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
       bgLayer.classList.remove('no-darken');
       overlayEl.classList.remove('no-darken');
+      countdownScreen.classList.remove('no-darken');
     }
 
     setupScreen.style.display = 'none';
