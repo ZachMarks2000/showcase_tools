@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown Timer</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@200;300;400;700;800&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: rgba(255,255,255,0.06);
+    --surface-hover: rgba(255,255,255,0.1);
+    --border: rgba(255,255,255,0.08);
+    --text: #f0f0f5;
+    --text-dim: rgba(255,255,255,0.5);
+    --accent: #6c5ce7;
+    --accent-glow: rgba(108,92,231,0.35);
+    --radius: 16px;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* ── Setup Screen ── */
+  #setup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 24px;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(108,92,231,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(162,85,255,0.08) 0%, transparent 50%),
+      var(--bg);
+    animation: bgShift 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes bgShift {
+    0%   { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+  }
+
+  .setup-card {
+    width: 100%;
+    max-width: 520px;
+    background: var(--surface);
+    backdrop-filter: blur(40px) saturate(1.4);
+    -webkit-backdrop-filter: blur(40px) saturate(1.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 36px 36px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  }
+
+  .setup-card h1 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.65rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .setup-card p.subtitle {
+    color: var(--text-dim);
+    font-size: 0.88rem;
+    margin-bottom: 32px;
+  }
+
+  .field { margin-bottom: 22px; }
+
+  .field label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .field input[type="text"] {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .date-input-wrap {
+    position: relative;
+  }
+
+  .date-input-wrap input[type="text"] {
+    padding-right: 48px;
+  }
+
+  .date-input-wrap .cal-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    opacity: 0.45;
+    transition: opacity 0.2s;
+    pointer-events: all;
+  }
+
+  .date-input-wrap .cal-icon:hover { opacity: 0.8; }
+
+  /* Time picker row */
+  .time-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .time-row select {
+    flex: 1;
+    padding: 12px 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+
+  .time-row select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .time-row select option {
+    background: #1c1c26;
+    color: var(--text);
+  }
+
+  .time-sep {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  /* Flatpickr overrides */
+  .flatpickr-calendar {
+    background: #1c1c26 !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6) !important;
+    font-family: 'Inter', sans-serif !important;
+    margin-top: 4px !important;
+  }
+
+  .flatpickr-calendar.arrowTop::before,
+  .flatpickr-calendar.arrowTop::after,
+  .flatpickr-calendar.arrowBottom::before,
+  .flatpickr-calendar.arrowBottom::after {
+    display: none !important;
+  }
+
+  .flatpickr-months .flatpickr-month,
+  .flatpickr-current-month .flatpickr-monthDropdown-months {
+    background: transparent !important;
+    color: var(--text) !important;
+  }
+
+  .flatpickr-current-month input.cur-year {
+    color: var(--text) !important;
+  }
+
+  span.flatpickr-weekday {
+    color: var(--text-dim) !important;
+    font-weight: 600 !important;
+  }
+
+  .flatpickr-day {
+    color: var(--text) !important;
+    border-radius: 8px !important;
+  }
+
+  .flatpickr-day:hover {
+    background: rgba(108,92,231,0.25) !important;
+    border-color: transparent !important;
+  }
+
+  .flatpickr-day.selected {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #fff !important;
+  }
+
+  .flatpickr-day.today {
+    border-color: var(--accent) !important;
+  }
+
+  .numInputWrapper span {
+    border-color: rgba(255,255,255,0.1) !important;
+  }
+
+  .numInputWrapper span:hover {
+    background: rgba(108,92,231,0.2) !important;
+  }
+
+  .numInputWrapper span svg path {
+    fill: rgba(255,255,255,0.5) !important;
+  }
+
+  .flatpickr-months .flatpickr-prev-month,
+  .flatpickr-months .flatpickr-next-month {
+    fill: var(--text) !important;
+  }
+
+  .flatpickr-months .flatpickr-prev-month:hover svg,
+  .flatpickr-months .flatpickr-next-month:hover svg {
+    fill: var(--accent) !important;
+  }
+
+  /* file upload */
+  .upload-area {
+    position: relative;
+    border: 2px dashed rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 28px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    overflow: hidden;
+  }
+
+  .upload-area:hover, .upload-area.dragover {
+    border-color: var(--accent);
+    background: rgba(108,92,231,0.06);
+  }
+
+  .hidden-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+    padding: 0;
+  }
+
+  .upload-area .icon {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+    opacity: 0.6;
+  }
+
+  .upload-area .label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .upload-area .label strong {
+    color: var(--accent);
+  }
+
+  .preview-wrap {
+    display: none;
+    position: relative;
+    margin-top: 10px;
+  }
+
+  .preview-wrap.visible { display: block; }
+
+  .preview-thumb {
+    width: 100%;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+  }
+
+  .btn-remove-img {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+  }
+
+  .btn-remove-img:hover {
+    background: rgba(220,50,50,0.8);
+    transform: scale(1.1);
+  }
+
+  /* start button */
+  .btn-start {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), #a855f7);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 24px var(--accent-glow);
+  }
+
+  .btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px var(--accent-glow);
+  }
+
+  .btn-start:active { transform: translateY(0); }
+
+  .btn-start:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ── Countdown Screen ── */
+  #countdown {
+    display: none;
+    position: fixed;
+    inset: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    z-index: 100;
+    cursor: none;
+  }
+
+  #countdown.active {
+    display: flex;
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  #countdown .bg-image {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.35) saturate(1.2);
+  }
+
+  #countdown .overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%);
+  }
+
+  #countdown .content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 32px;
+    max-width: 960px;
+  }
+
+  .countdown-message {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    font-size: clamp(1.4rem, 4vw, 2.6rem);
+    color: rgba(255,255,255,0.88);
+    margin-bottom: 48px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  .timer-grid {
+    display: flex;
+    gap: clamp(12px, 3vw, 32px);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .timer-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+  }
+
+  .timer-value {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 10vw, 7.5rem);
+    line-height: 1;
+    background: linear-gradient(180deg, #ffffff 30%, rgba(255,255,255,0.55) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 4px 30px rgba(108,92,231,0.3));
+    transition: transform 0.3s ease;
+  }
+
+  .timer-value.tick {
+    animation: pop 0.35s ease;
+  }
+
+  @keyframes pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  .timer-label {
+    font-size: clamp(0.65rem, 1.4vw, 0.85rem);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.4);
+    margin-top: 10px;
+    font-weight: 600;
+  }
+
+  .separator {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 200;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    color: rgba(255,255,255,0.18);
+    align-self: flex-start;
+    margin-top: 0.1em;
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.2; }
+  }
+
+  .finished-message {
+    display: none;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    background: linear-gradient(135deg, #6c5ce7, #a855f7, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from { filter: drop-shadow(0 0 20px rgba(108,92,231,0.5)); }
+    to   { filter: drop-shadow(0 0 40px rgba(168,85,247,0.7)); }
+  }
+
+  .btn-back {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 10;
+    padding: 10px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s, background 0.2s, color 0.2s;
+  }
+
+  .btn-back:hover {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+  }
+
+  #countdown:hover .btn-back { opacity: 1; }
+
+  /* scrollbar hide */
+  ::-webkit-scrollbar { display: none; }
+
+  /* shake for validation */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+  }
+
+  .shake { animation: shake 0.4s ease; }
+</style>
+</head>
+<body>
+
+<!-- ── SETUP SCREEN ── -->
+<div id="setup">
+  <div class="setup-card">
+    <h1>Countdown Timer</h1>
+    <p class="subtitle">Set your target date, add a message, and pick a background.</p>
+
+    <div class="field">
+      <label>Target Date</label>
+      <div class="date-input-wrap">
+        <input type="text" id="targetDate" placeholder="Click to pick a date" readonly>
+        <svg class="cal-icon" id="calIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Target Time</label>
+      <div class="time-row">
+        <select id="timeHour"></select>
+        <span class="time-sep">:</span>
+        <select id="timeMinute"></select>
+        <select id="timeAmPm">
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Display Message</label>
+      <input type="text" id="message" placeholder="e.g. Until launch day…" maxlength="120">
+    </div>
+
+    <div class="field">
+      <label>Background Image <span style="opacity:0.5">(optional)</span></label>
+      <input type="file" id="bgFile" class="hidden-file-input" accept="image/*">
+      <div class="upload-area" id="uploadArea">
+        <div class="icon">🖼</div>
+        <div class="label">Drag &amp; drop or <strong>browse</strong></div>
+      </div>
+      <div class="preview-wrap" id="previewWrap">
+        <img class="preview-thumb" id="previewThumb" alt="preview">
+        <button class="btn-remove-img" id="removeImg" title="Remove image">&times;</button>
+      </div>
+    </div>
+
+    <button class="btn-start" id="startBtn">Start Countdown</button>
+  </div>
+</div>
+
+<!-- ── COUNTDOWN SCREEN ── -->
+<div id="countdown">
+  <div class="bg-image" id="bgLayer"></div>
+  <div class="overlay"></div>
+  <button class="btn-back" id="backBtn">← Back</button>
+  <div class="content">
+    <div class="countdown-message" id="cdMessage"></div>
+    <div class="timer-grid" id="timerGrid">
+      <div class="timer-unit">
+        <div class="timer-value" id="days">00</div>
+        <div class="timer-label">Days</div>
+      </div>
+      <div class="separator">:</div>
+      <div class="timer-unit">
+        <div class="timer-value" id="hours">00</div>
+        <div class="timer-label">Hours</div>
+      </div>
+      <div class="separator">:</div>
+      <div class="timer-unit">
+        <div class="timer-value" id="minutes">00</div>
+        <div class="timer-label">Minutes</div>
+      </div>
+      <div class="separator">:</div>
+      <div class="timer-unit">
+        <div class="timer-value" id="seconds">00</div>
+        <div class="timer-label">Seconds</div>
+      </div>
+    </div>
+    <div class="finished-message" id="finishedMsg">Time's Up!</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  const $ = id => document.getElementById(id);
+
+  const targetDateInput = $('targetDate');
+  const calIcon         = $('calIcon');
+  const timeHour        = $('timeHour');
+  const timeMinute      = $('timeMinute');
+  const timeAmPm        = $('timeAmPm');
+  const messageInput    = $('message');
+  const bgFileInput     = $('bgFile');
+  const uploadArea      = $('uploadArea');
+  const previewThumb    = $('previewThumb');
+  const startBtn        = $('startBtn');
+  const backBtn         = $('backBtn');
+
+  const setupScreen     = $('setup');
+  const countdownScreen = $('countdown');
+  const bgLayer         = $('bgLayer');
+  const cdMessage       = $('cdMessage');
+  const timerGrid       = $('timerGrid');
+  const finishedMsg     = $('finishedMsg');
+
+  const units = { days: $('days'), hours: $('hours'), minutes: $('minutes'), seconds: $('seconds') };
+
+  let bgDataUrl = null;
+  let intervalId = null;
+  let prev = {};
+
+  // Populate time dropdowns
+  for (let h = 1; h <= 12; h++) {
+    const opt = document.createElement('option');
+    opt.value = h;
+    opt.textContent = String(h).padStart(2, '0');
+    timeHour.appendChild(opt);
+  }
+  for (let m = 0; m < 60; m += 5) {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = String(m).padStart(2, '0');
+    timeMinute.appendChild(opt);
+  }
+
+  // Set default time to current time (rounded to next 5 min)
+  const now = new Date();
+  let curH = now.getHours();
+  let curM = Math.ceil(now.getMinutes() / 5) * 5;
+  if (curM >= 60) { curM = 0; curH++; }
+  const isPM = curH >= 12;
+  const display12 = curH % 12 || 12;
+  timeHour.value = display12;
+  timeMinute.value = curM;
+  timeAmPm.value = isPM ? 'PM' : 'AM';
+
+  const tomorrow = new Date(Date.now() + 86400000);
+  const fp = flatpickr(targetDateInput, {
+    enableTime: false,
+    dateFormat: 'F j, Y',
+    defaultDate: tomorrow,
+    minDate: 'today',
+    animate: true,
+    disableMobile: true,
+  });
+
+  calIcon.addEventListener('click', () => fp.open());
+
+  // File handling
+  const previewWrap = $('previewWrap');
+  const removeImg   = $('removeImg');
+
+  function handleFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      bgDataUrl = e.target.result;
+      previewThumb.src = bgDataUrl;
+      previewWrap.classList.add('visible');
+      uploadArea.querySelector('.label').innerHTML = `<strong>${file.name}</strong>`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearImage() {
+    bgDataUrl = null;
+    bgFileInput.value = '';
+    previewThumb.src = '';
+    previewWrap.classList.remove('visible');
+    uploadArea.querySelector('.label').innerHTML = 'Drag &amp; drop or <strong>browse</strong>';
+  }
+
+  removeImg.addEventListener('click', e => {
+    e.stopPropagation();
+    clearImage();
+  });
+
+  bgFileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+  uploadArea.addEventListener('click', () => {
+    bgFileInput.value = '';
+    bgFileInput.click();
+  });
+
+  uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    handleFile(e.dataTransfer.files[0]);
+  });
+
+  // Validation + Start
+  startBtn.addEventListener('click', () => {
+    const selected = fp.selectedDates[0];
+    if (!selected) {
+      targetDateInput.closest('.date-input-wrap').classList.add('shake');
+      setTimeout(() => targetDateInput.closest('.date-input-wrap').classList.remove('shake'), 400);
+      return;
+    }
+
+    let h = parseInt(timeHour.value);
+    const m = parseInt(timeMinute.value);
+    const ampm = timeAmPm.value;
+    if (ampm === 'PM' && h !== 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+
+    const target = new Date(selected);
+    target.setHours(h, m, 0, 0);
+
+    const msg = messageInput.value.trim() || 'Counting down…';
+    cdMessage.textContent = msg;
+
+    if (bgDataUrl) {
+      bgLayer.style.backgroundImage = `url(${bgDataUrl})`;
+    } else {
+      bgLayer.style.backgroundImage = 'none';
+      bgLayer.style.background = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)';
+    }
+
+    setupScreen.style.display = 'none';
+    countdownScreen.classList.add('active');
+    document.documentElement.requestFullscreen?.().catch(() => {});
+
+    prev = {};
+    tick(target);
+    intervalId = setInterval(() => tick(target), 1000);
+  });
+
+  function tick(target) {
+    const now = Date.now();
+    let diff = target.getTime() - now;
+
+    if (diff <= 0) {
+      clearInterval(intervalId);
+      timerGrid.style.display = 'none';
+      finishedMsg.style.display = 'block';
+      return;
+    }
+
+    const d = Math.floor(diff / 86400000); diff %= 86400000;
+    const h = Math.floor(diff / 3600000);  diff %= 3600000;
+    const m = Math.floor(diff / 60000);    diff %= 60000;
+    const s = Math.floor(diff / 1000);
+
+    update('days', d);
+    update('hours', h);
+    update('minutes', m);
+    update('seconds', s);
+  }
+
+  function update(key, value) {
+    const str = String(value).padStart(2, '0');
+    if (prev[key] !== str) {
+      units[key].textContent = str;
+      units[key].classList.remove('tick');
+      void units[key].offsetWidth;
+      units[key].classList.add('tick');
+      prev[key] = str;
+    }
+  }
+
+  // Back button
+  backBtn.addEventListener('click', () => {
+    clearInterval(intervalId);
+    countdownScreen.classList.remove('active');
+    setupScreen.style.display = 'flex';
+    timerGrid.style.display = 'flex';
+    finishedMsg.style.display = 'none';
+    if (document.fullscreenElement) document.exitFullscreen?.();
+  });
+
+  // Escape to go back
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && countdownScreen.classList.contains('active')) {
+      backBtn.click();
+    }
+  });
+</script>
+</body>
+</html>
