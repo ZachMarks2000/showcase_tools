@@ -603,7 +603,7 @@
     font-size: clamp(0.8rem, 1.6vw, 1.1rem);
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.88);
     margin-top: 10px;
     font-weight: 600;
   }
@@ -982,7 +982,7 @@
 
     document.querySelectorAll('.timer-label').forEach(el => {
       const isSeconds = el.textContent.trim().toLowerCase() === 'seconds';
-      el.style.color = (isSeconds ? secClr : timerClr) + '66';
+      el.style.color = isSeconds ? secClr : timerClr;
     });
     document.querySelectorAll('.separator').forEach((el, i) => {
       const allSeps = document.querySelectorAll('.separator');
