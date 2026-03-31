@@ -683,6 +683,97 @@
   }
 
   .shake { animation: shake 0.4s ease; }
+
+  /* vertical position slider */
+  .range-field {
+    margin-bottom: 16px;
+  }
+
+  .range-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .range-header label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+
+  .range-header .range-value {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    min-width: 50px;
+    text-align: right;
+  }
+
+  .range-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(108,92,231,0.3);
+  }
+
+  .range-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 2px 12px rgba(108,92,231,0.5);
+  }
+
+  .range-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+  }
+
+  .range-slider::-moz-range-track {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+  }
+
+  .range-reset {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .range-reset.visible {
+    opacity: 1;
+  }
+
+  .range-reset:hover {
+    text-decoration: underline;
+  }
 </style>
 </head>
 <body>
@@ -756,6 +847,14 @@
       </div>
     </div>
 
+    <div class="range-field">
+      <div class="range-header">
+        <label>Vertical Position</label>
+        <span><button class="range-reset" id="posReset" type="button">Reset</button><span class="range-value" id="posLabel">Center</span></span>
+      </div>
+      <input type="range" class="range-slider" id="verticalPos" min="-50" max="50" value="0" step="1">
+    </div>
+
     <button class="btn-start" id="startBtn">Start Countdown</button>
   </div>
 </div>
@@ -816,6 +915,10 @@
   const finishedMsg     = $('finishedMsg');
 
   const units = { days: $('days'), hours: $('hours'), minutes: $('minutes'), seconds: $('seconds') };
+
+  const verticalPos    = $('verticalPos');
+  const posLabel       = $('posLabel');
+  const posReset       = $('posReset');
 
   let bgDataUrl = null;
   let intervalId = null;
@@ -923,6 +1026,24 @@
     uploadArea.querySelector('.label').innerHTML = 'Drag &amp; drop or <strong>browse</strong>';
   }
 
+  function updatePosLabel() {
+    const val = parseInt(verticalPos.value);
+    if (val === 0) {
+      posLabel.textContent = 'Center';
+    } else if (val < 0) {
+      posLabel.textContent = Math.abs(val) + '% up';
+    } else {
+      posLabel.textContent = val + '% down';
+    }
+    posReset.classList.toggle('visible', val !== 0);
+  }
+
+  verticalPos.addEventListener('input', updatePosLabel);
+  posReset.addEventListener('click', () => {
+    verticalPos.value = 0;
+    updatePosLabel();
+  });
+
   removeImg.addEventListener('click', e => {
     e.stopPropagation();
     clearImage();
@@ -1003,6 +1124,10 @@
       overlayEl.classList.remove('no-darken');
       countdownScreen.classList.remove('no-darken');
     }
+
+    const contentEl = document.querySelector('#countdown .content');
+    const vOffset = parseInt(verticalPos.value);
+    contentEl.style.transform = vOffset !== 0 ? `translateY(${vOffset}vh)` : '';
 
     setupScreen.style.display = 'none';
     countdownScreen.classList.add('active');
