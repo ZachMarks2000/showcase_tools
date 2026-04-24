@@ -840,7 +840,7 @@
       </div>
       <div class="toggle-row" id="darkenToggleRow">
         <label class="toggle">
-          <input type="checkbox" id="darkenToggle" checked>
+          <input type="checkbox" id="darkenToggle">
           <span class="toggle-track"></span>
         </label>
         <span>Darken background image</span>
@@ -901,6 +901,7 @@
   const timeMinute      = $('timeMinute');
   const timeAmPm        = $('timeAmPm');
   const messageInput    = $('message');
+  messageInput.value = 'Welcome! The Showcase Marketing Engineering meeting will start in...';
   const bgFileInput     = $('bgFile');
   const uploadArea      = $('uploadArea');
   const previewThumb    = $('previewThumb');
@@ -1011,6 +1012,7 @@
       previewThumb.src = bgDataUrl;
       previewWrap.classList.add('visible');
       darkenToggleRow.classList.add('visible');
+      darkenToggle.checked = false;
       uploadArea.querySelector('.label').innerHTML = `<strong>${file.name}</strong>`;
     };
     reader.readAsDataURL(file);
@@ -1082,7 +1084,7 @@
     const target = new Date(selected);
     target.setHours(h, m, 0, 0);
 
-    const msg = messageInput.value.trim() || 'Counting down…';
+    const msg = messageInput.value.trim() || 'Welcome! The Showcase Marketing Engineering meeting will start in...';
     cdMessage.textContent = msg;
 
     const msgClr = selectedColors.msg;
