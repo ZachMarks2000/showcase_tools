@@ -397,57 +397,190 @@
   }
 
   /* color pickers */
-  .color-group {
-    margin-bottom: 8px;
+  .color-master {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
   }
 
-  .color-group:last-child { margin-bottom: 0; }
+  .color-master.open {
+    border-color: var(--accent);
+  }
 
-  .color-group-label {
+  .color-toggle-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 14px;
     font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     color: var(--text-dim);
-    margin-bottom: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    font-family: inherit;
+  }
+
+  .color-toggle-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+
+  .color-toggle-btn.active {
+    color: var(--text);
+    background: rgba(108,92,231,0.08);
+  }
+
+  .color-toggle-btn .toggle-label {
+    flex: 1;
+    text-align: left;
+  }
+
+  .color-toggle-btn .chevron {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+    opacity: 0.4;
+  }
+
+  .color-toggle-btn.active .chevron {
+    transform: rotate(180deg);
+    opacity: 0.8;
+  }
+
+  .color-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+    opacity: 0;
+  }
+
+  .color-panel.open {
+    max-height: 400px;
+    opacity: 1;
+  }
+
+  .color-panel-content {
+    padding: 10px 14px 12px;
+  }
+
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+  }
+
+  .color-row:first-child { padding-top: 0; }
+  .color-row:last-child { padding-bottom: 0; }
+
+  .color-row-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    width: 72px;
+    flex-shrink: 0;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .color-panel-inner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
   }
 
   .color-swatches {
     display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    gap: 4px;
+    flex-wrap: nowrap;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
   }
 
   .color-swatches button {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 2px solid transparent;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: none;
+    outline: none;
     cursor: pointer;
-    transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+    transition: transform 0.15s, box-shadow 0.2s;
     position: relative;
+    flex-shrink: 0;
   }
 
   .color-swatches button:hover {
-    transform: scale(1.15);
+    transform: scale(1.2);
   }
 
   .color-swatches button.selected {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px var(--accent-glow);
+    box-shadow: 0 0 0 2px var(--accent-glow), inset 0 0 0 2px var(--accent);
   }
 
   .color-swatches button.swatch-white {
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
   }
 
   .color-swatches button.swatch-white.selected {
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 0 0 2px var(--accent-glow);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25), 0 0 0 2px var(--accent-glow), inset 0 0 0 2px var(--accent);
   }
 
   .color-swatches button.swatch-black {
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
   }
 
   .color-swatches button.swatch-black.selected {
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15), 0 0 0 2px var(--accent-glow);
+    box-shadow: 0 0 0 2px var(--accent-glow), 0 0 0 1px var(--accent);
+  }
+
+  .custom-color-sep {
+    width: 1px;
+    height: 14px;
+    background: var(--border);
+    flex-shrink: 0;
+    margin: 0 1px;
+  }
+
+  .custom-color-input {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 0;
+    background: transparent;
+    transition: border-color 0.2s;
+    flex-shrink: 0;
+  }
+
+  .custom-color-input:hover {
+    border-color: var(--accent);
+  }
+
+  .custom-color-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  .custom-color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+  }
+
+  .custom-color-input::-moz-color-swatch {
+    border: none;
+    border-radius: 2px;
   }
 
   /* start button */
@@ -813,17 +946,39 @@
 
     <div class="field">
       <label>Text Colors</label>
-      <div class="color-group">
-        <div class="color-group-label">Message</div>
-        <div class="color-swatches" id="msgSwatches" data-target="msg"></div>
-      </div>
-      <div class="color-group">
-        <div class="color-group-label">Countdown</div>
-        <div class="color-swatches" id="timerSwatches" data-target="timer"></div>
-      </div>
-      <div class="color-group">
-        <div class="color-group-label">Seconds</div>
-        <div class="color-swatches" id="secondsSwatches" data-target="seconds"></div>
+      <div class="color-master">
+        <button type="button" class="color-toggle-btn" onclick="toggleColorPanel(this)">
+          <span class="toggle-label">Text Colors</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="color-panel">
+          <div class="color-panel-content">
+            <div class="color-row" data-color-group="msg">
+              <span class="color-row-label">Message</span>
+              <div class="color-panel-inner">
+                <div class="color-swatches" id="msgSwatches" data-target="msg"></div>
+                <span class="custom-color-sep"></span>
+                <input type="color" class="custom-color-input" value="#ffffff" data-target="msg" onchange="onCustomColor(this)">
+              </div>
+            </div>
+          <div class="color-row" data-color-group="timer">
+            <span class="color-row-label">Countdown</span>
+            <div class="color-panel-inner">
+              <div class="color-swatches" id="timerSwatches" data-target="timer"></div>
+              <span class="custom-color-sep"></span>
+              <input type="color" class="custom-color-input" value="#ffffff" data-target="timer" onchange="onCustomColor(this)">
+            </div>
+          </div>
+          <div class="color-row" data-color-group="seconds">
+            <span class="color-row-label">Seconds</span>
+            <div class="color-panel-inner">
+              <div class="color-swatches" id="secondsSwatches" data-target="seconds"></div>
+              <span class="custom-color-sep"></span>
+              <input type="color" class="custom-color-input" value="#ffffff" data-target="seconds" onchange="onCustomColor(this)">
+            </div>
+          </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -925,47 +1080,73 @@
   let intervalId = null;
   let prev = {};
 
-  // Color swatches
-  const swatchColors = [
-    { hex: '#ffffff', name: 'White', cls: 'swatch-white' },
-    { hex: '#f0f0f5', name: 'Soft White' },
-    { hex: '#a0a0b0', name: 'Silver' },
-    { hex: '#000000', name: 'Black', cls: 'swatch-black' },
-    { hex: '#fbbf24', name: 'Amber' },
-    { hex: '#f97316', name: 'Orange' },
-    { hex: '#ef4444', name: 'Red' },
-    { hex: '#f472b6', name: 'Pink' },
-    { hex: '#a855f7', name: 'Purple' },
-    { hex: '#6c5ce7', name: 'Indigo' },
-    { hex: '#3b82f6', name: 'Blue' },
-    { hex: '#06b6d4', name: 'Cyan' },
-    { hex: '#10b981', name: 'Emerald' },
-    { hex: '#84cc16', name: 'Lime' },
-  ];
+   // Color swatches
+   const swatchColors = [
+     { hex: '#ffffff', name: 'White', cls: 'swatch-white' },
+     { hex: '#f0f0f5', name: 'Soft White' },
+     { hex: '#a0a0b0', name: 'Silver' },
+     { hex: '#000000', name: 'Black', cls: 'swatch-black' },
+     { hex: '#fbbf24', name: 'Amber' },
+     { hex: '#f97316', name: 'Orange' },
+     { hex: '#ef4444', name: 'Red' },
+     { hex: '#f472b6', name: 'Pink' },
+     { hex: '#a855f7', name: 'Purple' },
+     { hex: '#6c5ce7', name: 'Indigo' },
+     { hex: '#3b82f6', name: 'Blue' },
+     { hex: '#06b6d4', name: 'Cyan' },
+     { hex: '#10b981', name: 'Emerald' },
+     { hex: '#84cc16', name: 'Lime' },
+   ];
 
-  const selectedColors = { msg: '#ffffff', timer: '#ffffff', seconds: '#ffffff' };
+   const selectedColors = { msg: '#ffffff', timer: '#ffffff', seconds: '#ffffff' };
 
-  function buildSwatches(containerId, targetKey) {
-    const container = $(containerId);
-    swatchColors.forEach((c, i) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.style.background = c.hex;
-      btn.title = c.name;
-      if (c.cls) btn.classList.add(c.cls);
-      if (i === 0) btn.classList.add('selected');
-      btn.addEventListener('click', () => {
-        container.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedColors[targetKey] = c.hex;
-      });
-      container.appendChild(btn);
-    });
-  }
+    function updateColorPreview(targetKey, hex) {
+      const row = document.querySelector(`.color-row[data-color-group="${targetKey}"]`);
+      if (!row) return;
+      const customInput = row.querySelector('.custom-color-input');
+      if (customInput) customInput.value = hex;
+    }
 
-  buildSwatches('msgSwatches', 'msg');
-  buildSwatches('timerSwatches', 'timer');
-  buildSwatches('secondsSwatches', 'seconds');
+    function toggleColorPanel(btn) {
+      const master = btn.closest('.color-master');
+      const panel = master.querySelector('.color-panel');
+      panel.classList.toggle('open');
+      btn.classList.toggle('active');
+      master.classList.toggle('open');
+    }
+
+    function onCustomColor(input) {
+      const targetKey = input.dataset.target;
+      const hex = input.value;
+      selectedColors[targetKey] = hex;
+      const row = input.closest('.color-row');
+      const swatchContainer = row.querySelector('.color-swatches');
+      swatchContainer.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+      updateColorPreview(targetKey, hex);
+    }
+
+   function buildSwatches(containerId, targetKey) {
+     const container = $(containerId);
+     swatchColors.forEach((c, i) => {
+       const btn = document.createElement('button');
+       btn.type = 'button';
+       btn.style.background = c.hex;
+       btn.title = c.name;
+       if (c.cls) btn.classList.add(c.cls);
+       if (i === 0) btn.classList.add('selected');
+       btn.addEventListener('click', () => {
+         container.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+         btn.classList.add('selected');
+         selectedColors[targetKey] = c.hex;
+         updateColorPreview(targetKey, c.hex);
+       });
+       container.appendChild(btn);
+     });
+   }
+
+   buildSwatches('msgSwatches', 'msg');
+   buildSwatches('timerSwatches', 'timer');
+   buildSwatches('secondsSwatches', 'seconds');
 
   // Populate time dropdowns
   for (let h = 1; h <= 12; h++) {
