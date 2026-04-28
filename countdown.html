@@ -773,15 +773,16 @@
     to   { filter: drop-shadow(0 0 40px rgba(168,85,247,0.7)); }
   }
 
-  .btn-back {
+  .btn-control {
     position: absolute;
     top: 24px;
-    left: 24px;
     z-index: 10;
-    padding: 10px 20px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 600;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
     color: rgba(255,255,255,0.6);
     background: rgba(255,255,255,0.08);
     backdrop-filter: blur(12px);
@@ -792,12 +793,25 @@
     transition: opacity 0.3s, background 0.2s, color 0.2s;
   }
 
-  .btn-back:hover {
+  .btn-control:hover {
     background: rgba(255,255,255,0.14);
     color: #fff;
   }
 
-  #countdown:hover .btn-back { opacity: 1; }
+  #countdown:hover .btn-control { opacity: 1; }
+
+  .btn-back {
+    left: 24px;
+    padding: 10px 20px;
+    width: auto;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .btn-fullscreen {
+    right: 24px;
+  }
 
   /* subtle scrollbar */
   #setup::-webkit-scrollbar { width: 6px; }
@@ -1018,7 +1032,11 @@
 <div id="countdown">
   <div class="bg-image" id="bgLayer"></div>
   <div class="overlay"></div>
-  <button class="btn-back" id="backBtn">← Back</button>
+  <button class="btn-control btn-back" id="backBtn">← Back</button>
+  <button class="btn-control btn-fullscreen" id="fullscreenBtn" title="Toggle fullscreen">
+    <svg id="fsEnterIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+    <svg id="fsExitIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+  </button>
   <div class="content">
     <div class="countdown-message" id="cdMessage"></div>
     <div class="timer-grid" id="timerGrid">
@@ -1062,6 +1080,9 @@
   const previewThumb    = $('previewThumb');
   const startBtn        = $('startBtn');
   const backBtn         = $('backBtn');
+  const fullscreenBtn   = $('fullscreenBtn');
+  const fsEnterIcon     = $('fsEnterIcon');
+  const fsExitIcon      = $('fsExitIcon');
 
   const setupScreen     = $('setup');
   const countdownScreen = $('countdown');
@@ -1363,6 +1384,23 @@
     finishedMsg.style.display = 'none';
     if (document.fullscreenElement) document.exitFullscreen?.();
   });
+
+  // Fullscreen toggle
+  function updateFsIcons() {
+    const isFs = !!document.fullscreenElement;
+    fsEnterIcon.style.display = isFs ? 'none' : 'block';
+    fsExitIcon.style.display = isFs ? 'block' : 'none';
+  }
+
+  fullscreenBtn.addEventListener('click', () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    } else {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  });
+
+  document.addEventListener('fullscreenchange', updateFsIcons);
 
   // Escape to go back
   document.addEventListener('keydown', e => {
