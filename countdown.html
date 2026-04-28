@@ -1155,7 +1155,7 @@
     opt.textContent = String(h).padStart(2, '0');
     timeHour.appendChild(opt);
   }
-  for (let m = 0; m < 60; m += 5) {
+  for (let m = 0; m < 60; m += 1) {
     const opt = document.createElement('option');
     opt.value = m;
     opt.textContent = String(m).padStart(2, '0');
